@@ -260,8 +260,11 @@ public class View extends javax.swing.JFrame {
 
         /* Create and display the form */
         // using lambda expression
-        java.awt.EventQueue.invokeLater(() -> {
-            new View().setVisible(true);
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new View().setVisible(true);
+            }
         });
     }
 
