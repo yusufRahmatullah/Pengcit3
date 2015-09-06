@@ -9,6 +9,7 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.logging.Level;
@@ -66,6 +67,7 @@ public class Controller {
 
         try {
             bufferedImage = ImageIO.read(file);
+            bufferedImage = getEqualiser();
             propertyText += "\nWidth : " + bufferedImage.getWidth();
             propertyText += "\nHeight : " + bufferedImage.getHeight();
 
@@ -96,7 +98,7 @@ public class Controller {
     /**
      * Count color difference
      */
-    public static void colorDifference () {
+    public static void  colorDifference () {
         colorMap = new HashMap<>();
         if (bufferedImage != null) {
             for (int i=0; i<bufferedImage.getHeight(); i++) {
@@ -121,4 +123,108 @@ public class Controller {
             }
         }
     }
+    
+    public static ArrayList getGrayScale(){
+        ArrayList<ArrayList> ret = new ArrayList();
+        if (bufferedImage != null) {
+            for (int i=0; i<bufferedImage.getHeight(); i++) {
+                ArrayList tempGray  = new ArrayList();
+                for (int j=0; j<bufferedImage.getWidth(); j++) {          
+                    int rgb = bufferedImage.getRGB(j, i);
+                    
+                    int r = (rgb >> 16) & 0xFF;
+                    int g = (rgb >> 8) & 0xFF;
+                    int b = (rgb & 0xFF);
+
+                    int grayLevel = (r + g + b) / 3;
+                    
+                    tempGray.add(grayLevel);
+                }
+                ret.add(tempGray);
+            }
+        }
+        return ret;
+    }
+    
+    private static ArrayList getColorFreq  (ArrayList<ArrayList> input){
+        ArrayList ret = new ArrayList<>(); 
+        for(int i=0 ; i<256 ; i++){
+            ret.add(0);
+        }
+        for(int i=0;i<input.size();i++){
+            ArrayList temp = input.get(i);
+            //nambahin kemunculan warna
+            for(int j=0;j<temp.size();j++){
+                int col = (int) temp.get(j);
+                ret.set(col, ((int)ret.get(col))+1);
+            }
+        }
+        return ret;
+    }
+    
+    private static ArrayList getCumulativeFreq(ArrayList colorFreq){
+        ArrayList ret = new ArrayList<>();
+        int cumulative = 0;
+        for(int i=0;i<colorFreq.size();i++){
+            cumulative += (int)colorFreq.get(i);
+            ret.add(cumulative);
+        }     
+        return ret;
+    }
+    
+    private static ArrayList getFeq(int cumulative){
+        int feq = cumulative / 256;
+        int rem = cumulative % 256;
+        ArrayList ret = new ArrayList<>();
+        for(int i=0 ; i<256 ; i++){
+            if(rem>0){
+                ret.add(feq+1);
+                rem--;
+            }
+            else{
+                ret.add(feq);
+            }
+        }
+        return ret;
+    }
+    
+    public static ArrayList getLookUpTable(){
+        ArrayList<ArrayList> grayScale = getGrayScale();
+        ArrayList colorFreq = getColorFreq(grayScale);
+        ArrayList cumulativeFreq = getCumulativeFreq(colorFreq);
+        ArrayList feq = getFeq((int) (cumulativeFreq.get(cumulativeFreq.size()-1)));
+        ArrayList cumulativeFeq = getCumulativeFreq(feq);
+        
+        for(int i=0;i<cumulativeFeq.size();i++){
+            System.out.println(cumulativeFeq.get(i));
+        }
+        
+        ArrayList ret = new ArrayList();
+        
+        int indexCumulativeFeq = 0 ;
+        for(int i=0;i<cumulativeFreq.size();i++){
+            while((int)cumulativeFreq.get(i) > (int)cumulativeFeq.get(indexCumulativeFeq)){
+                indexCumulativeFeq++;
+            }
+                ret.add(indexCumulativeFeq);
+        }
+        return ret;
+    }
+    
+    public static BufferedImage getEqualiser(){
+        BufferedImage ret = new BufferedImage(bufferedImage.getWidth(),bufferedImage.getHeight(),BufferedImage.TYPE_INT_RGB);
+        ArrayList<ArrayList> grayScale = getGrayScale();
+        
+        ArrayList lookUpTable = getLookUpTable();
+        
+        for(int i=0;i<grayScale.size();i++){
+            ArrayList temp = grayScale.get(i);
+            for(int j=0;j<temp.size();j++){
+                int map = (int)lookUpTable.get((int)temp.get(j));
+                ret.setRGB(j, i, map << 16 | map << 8 | map);
+            }
+        }
+        return ret;
+    }
+    
 }
