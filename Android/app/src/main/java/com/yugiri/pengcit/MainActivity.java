@@ -49,9 +49,20 @@ public class MainActivity extends AppCompatActivity
 	public void onNavigationDrawerItemSelected(int position) {
 		// update the main content by replacing fragments
 		FragmentManager fragmentManager = getSupportFragmentManager();
-		fragmentManager.beginTransaction()
-				.replace(R.id.container, GreyScaleFragment.newInstance())
-				.commit();
+		switch (position){
+			case 0: fragmentManager.beginTransaction()
+						.replace(R.id.container, GreyScaleFragment.newInstance())
+						.commit();
+					break;
+			case 1: fragmentManager.beginTransaction()
+						.replace(R.id.container, NumberRecognizerFragment.newInstance())
+						.commit();
+					break;
+			case 2: fragmentManager.beginTransaction()
+						.replace(R.id.container, PlatNomerFragment.newInstance())
+						.commit();
+		}
+
 	}
 
 	@Override

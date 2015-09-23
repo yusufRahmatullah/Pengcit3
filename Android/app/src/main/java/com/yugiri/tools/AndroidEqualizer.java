@@ -5,6 +5,7 @@ import android.widget.ArrayAdapter;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
@@ -52,6 +53,18 @@ public class AndroidEqualizer {
 			}
 		}
 		return ret;
+	}
+
+	public static int[] getGrayScaledColorFreq(ArrayList<ArrayList> grayScale){
+		int[] colorFreq = new int[256];
+		for(int i=0; i<grayScale.size(); i++){
+			ArrayList temp = grayScale.get(i);
+			for(int j=0; j<temp.size(); j++){
+				int col = (int) temp.get(j);
+				colorFreq[col]++;
+			}
+		}
+		return colorFreq;
 	}
 
 	private static ArrayList getCumulativeFreq(ArrayList colorFreq,int adjust){
@@ -135,6 +148,23 @@ public class AndroidEqualizer {
 		int[] pixels = new int[width * height];
 		bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
 		ArrayList<ArrayList> grayScale = getGrayScale(pixels, width, height);
+
+		for(int i=0;i<grayScale.size();i++){
+			ArrayList temp = grayScale.get(i);
+			for(int j=0;j<temp.size();j++){
+				int map = (int)temp.get(j);
+				pixels[i * width + j] = map << 16 | map << 8 | map;
+			}
+		}
+		ret.setPixels(pixels, 0, width, 0, 0, width, height);
+		return ret;
+	}
+
+	public static Bitmap getGrayScaledBitmap(Bitmap bitmap, ArrayList<ArrayList> grayScale){
+		int width = bitmap.getWidth();
+		int height = bitmap.getHeight();
+		Bitmap ret = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+		int[] pixels = new int[width * height];
 
 		for(int i=0;i<grayScale.size();i++){
 			ArrayList temp = grayScale.get(i);
