@@ -24,7 +24,18 @@ public class PlatNomerTool {
     private static String propertyText;
     private static Bitmap displayedImage;
     private static HashMap<Integer, Integer> colorMap;
-    
+
+    public static final String[] model = {"0754321",
+            "060642021",
+            "076506421234520",
+            "076545076542012340123420",
+            "06064642421",
+            "06460765432012342",
+            "0645607654321",
+            "064242",
+            "076576543213210",
+            "0765420124321"};
+
     /**
      * Set property text with the newText
      * @param newText 
@@ -380,11 +391,28 @@ public class PlatNomerTool {
      * chain code with statisticalAnalyze(String) then append object's property
      * to property text
      */
-    public static void statisticalAnalyze(Bitmap bitmap) {
-        ArrayList<String> chainCodes = getChainCodes(temporaryImage);
+    public static String statisticalAnalyze(Bitmap bitmap) {
+        StringBuilder detectedNumberBuilder = new StringBuilder();
+        ArrayList<String> chainCodes = getChainCodes(bitmap);
         for (int i=0; i<chainCodes.size(); i++) {
-            propertyText += "\n" + statisticalAnalyze(chainCodes.get(i));
+            String normalizedChainCode = normalizeChaincode(chainCodes.get(i));
+            String direction = getDirection(normalizedChainCode);
+            detectedNumberBuilder.append(analyzeNumber(direction) + " ");
+//            propertyText += "\n" + statisticalAnalyze(chainCodes.get(i));
         }
+        return detectedNumberBuilder.toString();
+    }
+
+    public static int[] invertPixels(int[] pixels){
+        int[] newPixels = new int[pixels.length];
+        for(int i=0; i<pixels.length; i++){
+            if(pixels[i] == 0xFF000000){
+                newPixels[i] = 0xFFFFFFFF;
+            }else{
+                newPixels[i] = 0xFF000000;
+            }
+        }
+        return newPixels;
     }
 
     public static Bitmap getBinaryImage(Bitmap bitmap){
@@ -400,7 +428,7 @@ public class PlatNomerTool {
         Bitmap ret = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
         for(int i=0; i<pixels.length; i++){
             int b = (pixels[i] & 0xFF);
-            if(b < threshold){
+            if(b > threshold){
                 pixels[i] = 0xFF000000;
             }else{
                 pixels[i] = 0xFFFFFFFF;
@@ -469,5 +497,77 @@ public class PlatNomerTool {
 
         return threshold;
 
+    }
+
+    public static String normalizeChaincode(String chaincode){
+        String ret = "";
+        ret += chaincode.charAt(0);
+        for(int i=1;i<chaincode.length()-2;i++){
+            if(ret.charAt(i-1)!=chaincode.charAt(i) && chaincode.charAt(i+1)!=chaincode.charAt(i)){
+                ret += ret.charAt(i-1);
+            }
+            else{
+                ret += chaincode.charAt(i);
+            }
+        }
+		if(chaincode.length() >= 2)
+			ret += chaincode.charAt(chaincode.length()-2);
+        return ret;
+    }
+
+    public static String getDirection(String chaincode){
+        String ret = "";
+        ret+=chaincode.charAt(0);
+        for(int i=1;i<chaincode.length();i++){
+            if(chaincode.charAt(i)!=chaincode.charAt(i-1)){
+                ret+=chaincode.charAt(i);
+            }
+        }
+        return ret;
+    }
+
+    public static int getDiffPoint(String direction, String curModel){
+
+        if(direction.length() == 0 ){
+            return curModel.length();
+        }
+        else if (curModel.length() == 0){
+            return direction.length();
+        }
+        else{
+            int add = getDiffPoint(direction,curModel.substring(0, curModel.length()-1)) + 1;
+            int del = getDiffPoint(direction.substring(0, direction.length() - 1), curModel) + 1;
+            int rep = getDiffPoint(direction.substring(0, direction.length()-1),curModel.substring(0, curModel.length()-1));
+
+            if(add <= del && add <= rep){
+                return add;
+            }
+            else if(del <= add && del <= rep){
+                return del;
+            }
+            else{
+                if(direction.charAt(direction.length()-1) == curModel.charAt(curModel.length()-1)){
+                    return rep;
+                }
+                else{
+                    return rep+1;
+                }
+            }
+        }
+    }
+
+    public static int analyzeNumber(String direction){
+        int [] point = new int[10];
+        for(int i=0;i<10;i++){
+            point[i] = direction.compareTo(model[i]);
+        }
+        int ret = 0;
+        for(int i=1;i<10;i++){
+            if(point[ret]>point[i]){
+                ret = i;
+            }
+        }
+
+        return ret;
     }
 }

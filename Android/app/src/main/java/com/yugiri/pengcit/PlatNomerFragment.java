@@ -22,6 +22,8 @@ import android.widget.TextView;
 import com.yugiri.tools.ChaincodeImage;
 import com.yugiri.tools.PlatNomerTool;
 
+import java.util.List;
+
 /**
  * Created by gilang on 23/09/2015.
  */
@@ -33,6 +35,7 @@ public class PlatNomerFragment extends Fragment{
 	private ChaincodeImage chaincodeImage;
 	private Toolbar toolbar;
 	private TextView text;
+	private String numbers;
 	private int number;
 
 	public PlatNomerFragment(){}
@@ -90,7 +93,11 @@ public class PlatNomerFragment extends Fragment{
 				@Override
 				protected void onPostExecute(Bitmap bitmap) {
 					super.onPostExecute(bitmap);
-					image.setImageBitmap(bitmap);
+					Bitmap bmp2 = bitmap.copy(bitmap.getConfig(), true);
+					image.setImageBitmap(bmp2);
+					numbers = PlatNomerTool.statisticalAnalyze(bitmap);
+					text.setText(numbers);
+
 				}
 			};
 			task.execute(bitmap);
