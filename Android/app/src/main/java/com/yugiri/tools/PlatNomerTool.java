@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 
@@ -24,6 +25,8 @@ public class PlatNomerTool {
     private static String propertyText;
     private static Bitmap displayedImage;
     private static HashMap<Integer, Integer> colorMap;
+    public static List<String> chainCodeList = new ArrayList<>();
+    public static List<String> kodeBelokList = new ArrayList<>();
 
     public static final String[] model = {"0754321",
             "060642021",
@@ -157,7 +160,8 @@ public class PlatNomerTool {
                     // post-tracing
                     boolean[][] mark = new boolean[image.getHeight()][image.getWidth()];
                     floodFill(image, mark, j, i, 0xFF000000, 0xFFFFFFFF);
-                    chainCodes.add(chainCode.toString());
+                    if(chainCode.toString().length() > 300)
+                        chainCodes.add(normalizeChaincode(chainCode.toString()));
                 }
             }
         }
@@ -394,6 +398,7 @@ public class PlatNomerTool {
     public static String statisticalAnalyze(Bitmap bitmap) {
         StringBuilder detectedNumberBuilder = new StringBuilder();
         ArrayList<String> chainCodes = getChainCodes(bitmap);
+        chainCodeList.addAll(chainCodes);
         for (int i=0; i<chainCodes.size(); i++) {
             String normalizedChainCode = normalizeChaincode(chainCodes.get(i));
             String direction = getDirection(normalizedChainCode);
@@ -439,8 +444,8 @@ public class PlatNomerTool {
     }
 
     public static Bitmap scaleBitmap(Bitmap bitmap){
-        int maxWidth = 1024;
-        int maxHeight = 1024;
+        int maxWidth = 256;
+        int maxHeight = 256;
         int originalWidth = bitmap.getWidth();
         int originalHeight = bitmap.getHeight();
         int newWidth = -1;
@@ -500,20 +505,85 @@ public class PlatNomerTool {
     }
 
     public static String normalizeChaincode(String chaincode){
-        String ret = "";
-        ret += chaincode.charAt(0);
-        for(int i=1;i<chaincode.length()-2;i++){
-            if(ret.charAt(i-1)!=chaincode.charAt(i) && chaincode.charAt(i+1)!=chaincode.charAt(i)){
-                ret += ret.charAt(i-1);
-            }
-            else{
-                ret += chaincode.charAt(i);
+        char lastChar, replacement;
+        int startIndex;
+        int counter;
+        int threshold = getThreshold(chaincode);
+        char[] code = chaincode.toCharArray();
+        lastChar = code[0];
+        replacement = code[0];
+        startIndex = 0;
+        for(int i=1; i<code.length; i++){
+            if(code[i] != lastChar){
+                counter = 0;
+                int j = i;
+                lastChar = code[i];
+                startIndex = i;
+                while (code[j] == lastChar) {
+                    counter++;
+                    j++;
+                    if(j>=code.length)
+                        break;
+                }
+                if (counter < threshold) {
+                    for (int n = startIndex; n < j; n++) {
+                        code[n] = replacement;
+                    }
+                    i = j - 1;
+                }else{
+                    if(j < code.length) {
+                        replacement = code[j-1];
+                    }
+                }
             }
         }
-		if(chaincode.length() >= 2)
-			ret += chaincode.charAt(chaincode.length()-2);
-        return ret;
+
+        System.out.println("ChainCode \n" + chaincode);
+        System.out.println("Threshold " + threshold);
+        System.out.println("Normalized " + String.valueOf(code));
+        return String.valueOf(code);
     }
+
+    public static int getThreshold(String chainCode){
+        int counter = 1;
+        char lastChar;
+        char[] code = chainCode.toCharArray();
+        List<Integer> lengths = new ArrayList<>();
+        lastChar = code[0];
+        for(int i=1; i<code.length; i++){
+            if(code[i] != lastChar){
+                lastChar = code[i];
+                if(counter > 3)
+                    lengths.add(counter);
+                counter = 1;
+            }else{
+                counter++;
+            }
+        }
+        int sum = 0;
+        int n = 0;
+        for(Integer i : lengths){
+            sum += i;
+            n++;
+        }
+        return sum / n;
+    }
+
+//    public static String normalizeChaincode(String chaincode){
+//        String ret = "";
+//        ret += chaincode.charAt(0);
+//        for(int i=1;i<chaincode.length()-2;i++){
+//            if(ret.charAt(i-1)!=chaincode.charAt(i) && chaincode.charAt(i+1)!=chaincode.charAt(i)){
+//                ret += ret.charAt(i-1);
+//            }
+//            else{
+//                ret += chaincode.charAt(i);
+//            }
+//        }
+//		if(chaincode.length() >= 2)
+//			ret += chaincode.charAt(chaincode.length()-2);
+//        return ret;
+//    }
 
     public static String getDirection(String chaincode){
         String ret = "";
@@ -554,6 +624,26 @@ public class PlatNomerTool {
                 }
             }
         }
+    }
+
+    public static void analyzeCodeBelok(){
+        for(String chainCode : chainCodeList){
+            String kodeBelok = getKodeBelok(chainCode);
+            kodeBelokList.add(kodeBelok);
+        }
+    }
+
+    public static String getKodeBelok(String chaincode){
+        String kodeBelok = "";
+        for(int i=1;i<chaincode.length();i++){
+            if((chaincode.charAt(i) - chaincode.charAt(i-1)) > 0 && ((chaincode.charAt(i) - chaincode.charAt(i-1)) < 4) || (chaincode.charAt(i) - chaincode.charAt(i-1)) > -8 && ((chaincode.charAt(i) - chaincode.charAt(i-1)) < -4)){
+                kodeBelok += '0';
+            }
+            else if((chaincode.charAt(i) - chaincode.charAt(i-1)) < 0 && ((chaincode.charAt(i) - chaincode.charAt(i-1)) > -4) || (chaincode.charAt(i) - chaincode.charAt(i-1)) < 8 && ((chaincode.charAt(i) - chaincode.charAt(i-1))  > 4)){
+                kodeBelok += '1';
+            }
+        }
+        return kodeBelok;
     }
 
     public static int analyzeNumber(String direction){

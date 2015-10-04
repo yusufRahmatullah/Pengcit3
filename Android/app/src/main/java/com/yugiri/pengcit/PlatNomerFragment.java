@@ -34,7 +34,7 @@ public class PlatNomerFragment extends Fragment{
 	private Bitmap bitmap;
 	private ChaincodeImage chaincodeImage;
 	private Toolbar toolbar;
-	private TextView text;
+	private TextView text, chainCodeText, kodeBelokText;
 	private String numbers;
 	private int number;
 
@@ -61,6 +61,8 @@ public class PlatNomerFragment extends Fragment{
 				startActivityForResult(i, LOAD_IMAGE);
 			}
 		});
+		chainCodeText = (TextView) v.findViewById(R.id.chaincode);
+		kodeBelokText = (TextView) v.findViewById(R.id.kodebelok);
 		return v;
 	}
 
@@ -96,6 +98,27 @@ public class PlatNomerFragment extends Fragment{
 					Bitmap bmp2 = bitmap.copy(bitmap.getConfig(), true);
 					image.setImageBitmap(bmp2);
 					numbers = PlatNomerTool.statisticalAnalyze(bitmap);
+					PlatNomerTool.analyzeCodeBelok();
+
+					StringBuilder builder = new StringBuilder();
+					builder.append("ChainCodes:\n\n\n");
+					int i=1;
+					for(String chainCode : PlatNomerTool.chainCodeList){
+						builder.append(i + ". " + chainCode + "\n\n");
+						i++;
+					}
+					chainCodeText.setText(builder.toString());
+
+
+					builder = new StringBuilder();
+					builder.append("KodeBelok:\n\n\n");
+					i = 1;
+					for(String kodeBelok : PlatNomerTool.kodeBelokList){
+						builder.append(i + ". " + kodeBelok + "\n\n");
+						i++;
+					}
+					kodeBelokText.setText(builder.toString());
+
 					text.setText(numbers);
 
 				}

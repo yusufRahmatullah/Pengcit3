@@ -61,6 +61,11 @@ public class MainActivity extends AppCompatActivity
 			case 2: fragmentManager.beginTransaction()
 						.replace(R.id.container, PlatNomerFragment.newInstance())
 						.commit();
+					break;
+			case 3: fragmentManager.beginTransaction()
+						.replace(R.id.container, CharacterGridFragment.newInstance())
+						.commit();
+					break;
 		}
 
 	}

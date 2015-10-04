@@ -4,6 +4,7 @@
 	<string name="title_section1">Equalization</string>
 	<string name="title_section2">Number Recognition</string>
 	<string name="title_section3">Plat Nomer Recognition</string>
+	<string name="title_section4">Image Grid</string>
 
 	<string name="navigation_drawer_open">Open navigation drawer</string>
 	<string name="navigation_drawer_close">Close navigation drawer</string>
