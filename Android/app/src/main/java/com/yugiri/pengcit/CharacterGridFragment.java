@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.yugiri.tools.ImageGrid;
 import com.yugiri.tools.PlatNomerTool;
@@ -33,9 +34,9 @@ public class CharacterGridFragment extends Fragment {
 	private static int LOAD_IMAGE = 0;
 	private ImageView image;
 	private Button browseButton, processButton, learnButton;
-	private Bitmap bitmap, gridImage, binaryImage;
+	private TextView resultText;
+	private Bitmap bitmap, gridImage;
 	private EditText character;
-	private String learnString;
 	private CheckBox checkBox;
 	private boolean isWhiteBackground;
 	private Toolbar toolbar;
@@ -59,7 +60,7 @@ public class CharacterGridFragment extends Fragment {
 		processButton = (Button) v.findViewById(R.id.btn_process);
 		learnButton = (Button) v.findViewById(R.id.btn_learn);
 		character = (EditText) v.findViewById(R.id.character);
-
+		resultText = (TextView) v.findViewById(R.id.result);
 
 
 		checkBox.setOnClickListener(new View.OnClickListener() {
@@ -86,6 +87,7 @@ public class CharacterGridFragment extends Fragment {
 					@Override
 					protected Bitmap doInBackground(Bitmap... params) {
 						params[0] = PlatNomerTool.scaleBitmap(params[0]);
+						params[0] = Tools.blur(params[0], 5);
 						params[0] = PlatNomerTool.getBinaryImage(params[0]);
 						if(isWhiteBackground)
 							params[0] = Tools.invertImage(params[0]);
@@ -110,6 +112,7 @@ public class CharacterGridFragment extends Fragment {
 					@Override
 					protected Bitmap doInBackground(Bitmap... params) {
 						params[0] = PlatNomerTool.scaleBitmap(params[0]);
+						params[0] = Tools.blur(params[0], 5);
 						params[0] = PlatNomerTool.getBinaryImage(params[0]);
 						if(isWhiteBackground)
 							params[0] = Tools.invertImage(params[0]);
@@ -118,11 +121,11 @@ public class CharacterGridFragment extends Fragment {
 						gridImage = Tools.drawGrid(gridImage, grids);
 						return gridImage;
 					}
-
 					@Override
 					protected void onPostExecute(Bitmap bitmap) {
 						super.onPostExecute(bitmap);
 						image.setImageBitmap(bitmap);
+						resultText.setText(Tools.getStringInGrids(grids));
 					}
 				};
 				task.execute(bitmap);
