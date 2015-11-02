@@ -59,6 +59,7 @@ public class GreyScaleFragment extends Fragment {
 		});
 
 		((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+		((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Image Equalization");
 
 		seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			@Override

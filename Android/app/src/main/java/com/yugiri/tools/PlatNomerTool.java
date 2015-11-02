@@ -19,14 +19,14 @@ import java.util.Set;
  */
 public class PlatNomerTool {
     private static final int imageSize = 505;
-    
+
     private static Bitmap bufferedImage;
     private static Bitmap temporaryImage;
     private static String propertyText;
     private static Bitmap displayedImage;
     private static HashMap<Integer, Integer> colorMap;
-    public static List<String> chainCodeList = new ArrayList<>();
-    public static List<String> kodeBelokList = new ArrayList<>();
+    public static List<String> chainCodeList;
+    public static List<String> kodeBelokList;
 
     public static final String[] model = {"0754321",
             "060642021",
@@ -41,15 +41,15 @@ public class PlatNomerTool {
 
     /**
      * Set property text with the newText
-     * @param newText 
+     * @param newText
      */
     public static void setPropertyText(String newText) {
         propertyText = newText;
     }
-    
+
     /**
      * return property text
-     * @return 
+     * @return
      */
     public static String getPropertyText() {
         return propertyText;
@@ -398,6 +398,7 @@ public class PlatNomerTool {
     public static String statisticalAnalyze(Bitmap bitmap) {
         StringBuilder detectedNumberBuilder = new StringBuilder();
         ArrayList<String> chainCodes = getChainCodes(bitmap);
+        chainCodes = new ArrayList<>();
         chainCodeList.addAll(chainCodes);
         for (int i=0; i<chainCodes.size(); i++) {
             String normalizedChainCode = normalizeChaincode(chainCodes.get(i));
@@ -627,6 +628,7 @@ public class PlatNomerTool {
     }
 
     public static void analyzeCodeBelok(){
+        kodeBelokList = new ArrayList<>();
         for(String chainCode : chainCodeList){
             String kodeBelok = getKodeBelok(chainCode);
             kodeBelokList.add(kodeBelok);

@@ -21,31 +21,30 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.yugiri.tools.ImageGrid;
 import com.yugiri.tools.PlatNomerTool;
+import com.yugiri.tools.ThinningTools;
 import com.yugiri.tools.Tools;
 
-import java.util.List;
-
 /**
- * Created by gilang on 03/10/2015.
+ * Created by gilang on 26/10/2015.
  */
-public class CharacterGridFragment extends Fragment {
+public class ThinningFragment extends Fragment {
+
 	private static int LOAD_IMAGE = 0;
 	private ImageView image;
 	private Button browseButton, processButton, learnButton;
 	private TextView resultText;
-	private Bitmap bitmap, gridImage;
+	private Bitmap bitmap, thinnedImage;
 	private EditText character;
 	private CheckBox checkBox;
 	private boolean isWhiteBackground;
 	private Toolbar toolbar;
-	private List<ImageGrid> grids;
+	private String result;
 
-	public CharacterGridFragment(){}
+	public ThinningFragment(){}
 
-	public static CharacterGridFragment newInstance(){
-		CharacterGridFragment fragment = new CharacterGridFragment();
+	public static ThinningFragment newInstance(){
+		ThinningFragment fragment = new ThinningFragment();
 		return fragment;
 	}
 
@@ -54,7 +53,7 @@ public class CharacterGridFragment extends Fragment {
 		View v = inflater.inflate(R.layout.fragment_character_grid, parent, false);
 		toolbar = (Toolbar) v.findViewById(R.id.toolbar);
 		((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-		((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Image Grid");
+		((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Thinning");
 		image = (ImageView) v.findViewById(R.id.image);
 		checkBox = (CheckBox) v.findViewById(R.id.checkbox);
 		browseButton = (Button) v.findViewById(R.id.btn_select);
@@ -62,8 +61,11 @@ public class CharacterGridFragment extends Fragment {
 		learnButton = (Button) v.findViewById(R.id.btn_learn);
 		character = (EditText) v.findViewById(R.id.character);
 		resultText = (TextView) v.findViewById(R.id.result);
+		resultText.setText("");
 
 
+		character.setVisibility(View.GONE);
+		learnButton.setVisibility(View.GONE);
 		checkBox.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -81,31 +83,6 @@ public class CharacterGridFragment extends Fragment {
 			}
 		});
 
-		learnButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				AsyncTask<Bitmap, Void, Bitmap> task = new AsyncTask<Bitmap, Void, Bitmap>() {
-					@Override
-					protected Bitmap doInBackground(Bitmap... params) {
-						params[0] = PlatNomerTool.scaleBitmap(params[0]);
-						params[0] = Tools.blur(params[0], 5);
-						params[0] = PlatNomerTool.getBinaryImage(params[0]);
-						if(isWhiteBackground)
-							params[0] = Tools.invertImage(params[0]);
-						return params[0];
-					}
-
-					@Override
-					protected void onPostExecute(Bitmap bitmap) {
-						super.onPostExecute(bitmap);
-						image.setImageBitmap(bitmap);
-						Tools.learn(bitmap, character.getText().toString());
-					}
-				};
-				task.execute(bitmap);
-			}
-		});
-
 		processButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -117,17 +94,15 @@ public class CharacterGridFragment extends Fragment {
 						params[0] = PlatNomerTool.getBinaryImage(params[0]);
 						if(isWhiteBackground)
 							params[0] = Tools.invertImage(params[0]);
-						gridImage = params[0].copy(params[0].getConfig(), true);
-						grids = Tools.getGrids(params[0]);
-						gridImage = Tools.drawGrid(gridImage, grids);
-						return gridImage;
+						thinnedImage = ThinningTools.thinImage(params[0]);
+						result = ThinningTools.getResult();
+						return thinnedImage;
 					}
 					@Override
 					protected void onPostExecute(Bitmap bitmap) {
 						super.onPostExecute(bitmap);
 						image.setImageBitmap(bitmap);
-						resultText.setText("Recognized Nunber(s): " + Tools.getStringInGrids
-								(grids));
+						resultText.setText("Recognized Number(s):\n" + result);
 					}
 				};
 				task.execute(bitmap);

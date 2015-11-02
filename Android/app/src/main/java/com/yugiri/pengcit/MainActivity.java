@@ -55,15 +55,19 @@ public class MainActivity extends AppCompatActivity
 						.commit();
 					break;
 			case 1: fragmentManager.beginTransaction()
-						.replace(R.id.container, NumberRecognizerFragment.newInstance())
-						.commit();
-					break;
-			case 2: fragmentManager.beginTransaction()
 						.replace(R.id.container, PlatNomerFragment.newInstance())
 						.commit();
 					break;
-			case 3: fragmentManager.beginTransaction()
+			case 2: fragmentManager.beginTransaction()
 						.replace(R.id.container, CharacterGridFragment.newInstance())
+						.commit();
+					break;
+			case 3: fragmentManager.beginTransaction()
+						.replace(R.id.container, ThinningFragment.newInstance())
+						.commit();
+					break;
+			case 4: fragmentManager.beginTransaction()
+						.replace(R.id.container, FaceRecognizerFragment.newInstance())
 						.commit();
 					break;
 		}

@@ -14,18 +14,36 @@
 			android:orientation="vertical"
 			android:paddingTop="?attr/actionBarSize">
 
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginLeft="15dp"
+				android:textSize="18sp"
+				android:textStyle="bold"
+				android:text="Original Image"/>
+
 			<ImageView
 				android:id="@+id/image"
 				android:layout_width="match_parent"
 				android:layout_height="200dp"
 				android:scaleType="centerInside"
-				android:layout_marginBottom="20dp"/>
+				android:layout_marginBottom="20dp"
+				android:src="#272822"/>
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginLeft="15dp"
+				android:textSize="18sp"
+				android:textStyle="bold"
+				android:text="Equalized Image"/>
 
 			<ImageView
 				android:id="@+id/image2"
 				android:layout_width="match_parent"
 				android:layout_height="200dp"
-				android:scaleType="centerInside"/>
+				android:scaleType="centerInside"
+				android:src="#272822"/>
 
 			<SeekBar
 				android:id="@+id/seekBar"
