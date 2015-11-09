@@ -50,6 +50,7 @@ public class PlatNomerFragment extends Fragment{
 		View v = inflater.inflate(R.layout.fragment_number_recognizer, parent, false);
 		toolbar = (Toolbar) v.findViewById(R.id.toolbar);
 		((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+		((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("Plat Recognition");
 		text = (TextView) v.findViewById(R.id.text);
 		image = (ImageView) v.findViewById(R.id.image);
 		button = (Button) v.findViewById(R.id.btn_select);
@@ -119,7 +120,7 @@ public class PlatNomerFragment extends Fragment{
 					}
 					kodeBelokText.setText(builder.toString());
 
-					text.setText(numbers);
+					text.setText("Recognized Number(s):\n" + numbers);
 
 				}
 			};
@@ -127,17 +128,6 @@ public class PlatNomerFragment extends Fragment{
 
 			image.setImageBitmap(bitmap);
 			image.setVisibility(View.VISIBLE);
-//			int width = bitmap.getWidth();
-//			int height = bitmap.getHeight();
-//			int[] pixels = new int[width * height];
-//			bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
-//			chaincodeImage = new ChaincodeImage(width, height, pixels);
-//			try {
-//				number = chaincodeImage.recognize();
-//				text.setText("Recognized number : " + number);
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//			}
 		}
 	}
 }

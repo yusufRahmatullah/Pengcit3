@@ -19,7 +19,7 @@
 				android:id="@+id/image"
 				android:layout_width="match_parent"
 				android:layout_height="220dp"
-				android:visibility="gone"/>
+				android:src="#272822"/>
 
 			<Button
 				android:id="@+id/btn_select"
@@ -31,7 +31,9 @@
 				android:id="@+id/text"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:textSize="20sp"/>
+				android:layout_marginTop="10dp"
+				android:textSize="20sp"
+				android:text="Note: You must use picture with dark colored background and light colored text"/>
 
 			<TextView
 				android:id="@+id/chaincode"
