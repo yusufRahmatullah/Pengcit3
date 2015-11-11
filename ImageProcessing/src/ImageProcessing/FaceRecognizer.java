@@ -35,13 +35,16 @@ public class FaceRecognizer {
     private static final double fcf = 1.0 / (2.0 * sqrt2);
     private static final double bbf = 1.0/9.0;
     private static final double gbf = 1.0/16.0;
+    private static final double sobelf = 1.0/4.0;
+    private static final double prewitf = 1.0/3.0;
+    private static final double freichanf = 1.0/(2.0 + sqrt2);
     
     // daftar operator untuk edge detection
-    public static final int[] SOBEL_OPERATOR = {-1,-2,-1,0,0,0,1,2,1};
-    public static final int[] SCHARR_OPERATOR = {-3,-10,-3,0,0,0,3,10,3};
-    public static final int[] PREWIT_OPERATOR = {-1,-1,-1,0,0,0,1,1,1};
+    public static final double[] SOBEL_OPERATOR = {-1 * sobelf,-2 * sobelf,-1 * sobelf,0,0,0,sobelf,2 * sobelf,1 * sobelf};
+    public static final double[] SCHARR_OPERATOR = {-3 * gbf,-10 * gbf,-3 * gbf,0,0,0,3 * gbf,10 * gbf,3 * gbf};
+    public static final double[] PREWIT_OPERATOR = {-1 * prewitf,-1 * prewitf,-1 * prewitf,0,0,0,prewitf,prewitf,prewitf};
     public static final int[] KIRSCH_OPERATOR = {-3, -3, -3, -3, 0, -3, 5, 5, 5};
-    public static final double[] FREI_CHAN_OPERATOR = {-1, -1*sqrt2, -1, 0, 0, 0, 1, sqrt2, 1};
+    public static final double[] FREI_CHAN_OPERATOR = {-1*freichanf, -1*sqrt2*freichanf, -1*freichanf, 0, 0, 0, freichanf, freichanf*sqrt2, freichanf};
     public static final int[] ROBERT_CROSS_OPERATOR = {1, 0, 0, -1};
     // daftar operator untuk edge detection tanpa melakukan perputaran (sekali hitung)
     public static final int[] DIAGONAL_LAPLACIAN = {1, 0, -1, 0, 0, 0, -1, 0, 1};
@@ -171,7 +174,7 @@ public class FaceRecognizer {
                                 * operator[k];
                     }
                     //newValue = Math.max(sumH, sumV);
-                    newValue = Math.max(Math.abs(sumH), Math.abs(sumV));
+                    newValue = Math.max(Math.abs(sumH/4), Math.abs(sumV/4));
                 }
                 // perhitungan untuk second order
                 else if (order == SECOND_ORDER) {
@@ -227,7 +230,8 @@ public class FaceRecognizer {
                         sumV += (image.getRGB(j + position[opdir][0], i + position[opdir][1]) & 0xFF)
                                 * operator[k];
                     }
-                    newValue = (int) Math.round(Math.max(sumH, sumV));
+                    //newValue = (int) Math.round(Math.max(sumH, sumV));
+                    newValue = (int) Math.round(Math.max(Math.abs(sumH), Math.abs(sumV)));
                 }
                 // perhitungan untuk second order
                 else if (order == SECOND_ORDER) {
