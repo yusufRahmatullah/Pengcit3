@@ -70,6 +70,10 @@ public class MainActivity extends AppCompatActivity
 						.replace(R.id.container, FaceRecognizerFragment.newInstance())
 						.commit();
 					break;
+			case 5: fragmentManager.beginTransaction()
+					.replace(R.id.container, SkinDetectorFragment.newInstance())
+					.commit();
+				break;
 		}
 
 	}

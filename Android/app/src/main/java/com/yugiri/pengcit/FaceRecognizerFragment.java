@@ -15,11 +15,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Spinner;
 
 import com.yugiri.tools.FaceRecognizer;
 import com.yugiri.tools.PlatNomerTool;
+import com.yugiri.tools.Tools;
 
 /**
  * Created by gilang on 02/11/2015.
@@ -28,8 +31,9 @@ public class FaceRecognizerFragment extends Fragment {
 
 	private static int LOAD_IMAGE;
 	private Bitmap originalBitmap;
-	private ImageView originalImage, homoDifImage, crossDifImage;
+	private ImageView originalImage, processedImage;
 	private Button btnBrowse, btnProcess;
+	private Spinner spinner;
 	private Toolbar toolbar;
 
 	public FaceRecognizerFragment(){}
@@ -43,10 +47,10 @@ public class FaceRecognizerFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState){
 		View v = inflater.inflate(R.layout.fragment_face_recognizer, parent, false);
 		originalImage = (ImageView) v.findViewById(R.id.img_original);
-		homoDifImage = (ImageView) v.findViewById(R.id.img_homogen_diff);
-		crossDifImage = (ImageView) v.findViewById(R.id.img_cross_diff);
+		processedImage = (ImageView) v.findViewById(R.id.img_processed);
 		btnBrowse = (Button) v.findViewById(R.id.btn_select);
 		btnProcess = (Button) v.findViewById(R.id.btn_process);
+		spinner = (Spinner) v.findViewById(R.id.spinner);
 		toolbar = (Toolbar) v.findViewById(R.id.toolbar);
 
 		((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
@@ -64,29 +68,104 @@ public class FaceRecognizerFragment extends Fragment {
 		btnProcess.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				AsyncTask<Bitmap, Void, Bitmap[]> task = new AsyncTask<Bitmap, Void, Bitmap[]>() {
+				AsyncTask<Bitmap, Void, Bitmap> task = new AsyncTask<Bitmap, Void, Bitmap>() {
+					int item = spinner.getSelectedItemPosition();
 
 					@Override
-					protected Bitmap[] doInBackground(Bitmap... params) {
-						Bitmap homoBitmap = FaceRecognizer.homogenDifference(originalBitmap);
-						Bitmap crossBitmap = FaceRecognizer.crossDifference(originalBitmap);
-						Bitmap[] bitmaps = new Bitmap[2];
-						bitmaps[0] = homoBitmap;
-						bitmaps[1] = crossBitmap;
-						return bitmaps;
+					protected Bitmap doInBackground(Bitmap... params) {
+						Bitmap output = Bitmap.createBitmap(params[0]);
+						switch(item) {
+							case 0:
+								output = FaceRecognizer.edgeDetection(params[0], FaceRecognizer
+									.FIRST_ORDER, FaceRecognizer.SOBEL_OPERATOR);
+								break;
+							case 1:
+								output = FaceRecognizer.edgeDetection(params[0], FaceRecognizer
+											.SECOND_ORDER, FaceRecognizer.SOBEL_OPERATOR);
+								break;
+							case 2:
+								output = FaceRecognizer.edgeDetection(params[0],
+									FaceRecognizer.FIRST_ORDER, FaceRecognizer.SCHARR_OPERATOR);
+								break;
+							case 3:
+								output = FaceRecognizer.edgeDetection(params[0], FaceRecognizer
+											.SECOND_ORDER, FaceRecognizer.SCHARR_OPERATOR);
+								break;
+							case 4:
+								output = FaceRecognizer.edgeDetection(params[0],
+									FaceRecognizer.FIRST_ORDER,FaceRecognizer.PREWIT_OPERATOR);
+								break;
+							case 5:
+								output = FaceRecognizer.edgeDetection(params[0],
+									FaceRecognizer.SECOND_ORDER,FaceRecognizer.PREWIT_OPERATOR);
+								break;
+							case 6:
+								output = FaceRecognizer.edgeDetection(params[0],
+									FaceRecognizer.FIRST_ORDER,FaceRecognizer.ROBERT_CROSS_OPERATOR);
+								break;
+							case 7:
+								output = FaceRecognizer.edgeDetection(params[0],
+									FaceRecognizer.FIRST_ORDER,FaceRecognizer.FREI_CHAN_OPERATOR);
+								break;
+							case 8:
+								output = FaceRecognizer.edgeDetection(params[0],
+									FaceRecognizer.SECOND_ORDER, FaceRecognizer.FREI_CHAN_OPERATOR);
+								break;
+							case 9:
+								output = FaceRecognizer.edgeDetection(params[0],
+									FaceRecognizer.FIRST_ORDER,FaceRecognizer.KIRSCH_OPERATOR);
+								break;
+							case 10:
+								output = FaceRecognizer.edgeDetection(params[0],
+									FaceRecognizer.SECOND_ORDER,FaceRecognizer.KIRSCH_OPERATOR);
+								break;
+							case 11:
+								output = FaceRecognizer.edgeDetection(params[0], FaceRecognizer
+									.DIAGONAL_LAPLACIAN);
+								break;
+							case 12:
+								output = FaceRecognizer.edgeDetection(params[0], FaceRecognizer
+									.DIAMOND_LAPLACIAN_1);
+								break;
+							case 13:
+								output = FaceRecognizer.edgeDetection(params[0], FaceRecognizer
+									.DIAMOND_LAPLACIAN_2);
+								break;
+							case 14:
+								output = FaceRecognizer.edgeDetection(params[0], FaceRecognizer
+									.FOUR_DIRECTIONAL_LAPLACIAN);
+								break;
+							case 15:
+								output = FaceRecognizer.edgeDetection(params[0],
+									FaceRecognizer.EIGHT_DIRECTIONAL_LAPLACIAN);
+								break;
+						}
+						output = PlatNomerTool.getBinaryImage(output);
+						output = Tools.invertImage(output);
+						output = FaceRecognizer.clusterFace(output);
+
+						return output;
 					}
 
 					@Override
-					protected void onPostExecute(Bitmap[] bitmaps) {
+					protected void onPostExecute(Bitmap bitmaps) {
 						super.onPostExecute(bitmaps);
-						homoDifImage.setImageBitmap(bitmaps[0]);
-						crossDifImage.setImageBitmap(bitmaps[1]);
+						processedImage.setImageBitmap(bitmaps);
 					}
 				};
 
 				task.execute(originalBitmap);
 			}
 		});
+
+		String[] objs = {"First Order Sobel", "Second Order Sobel", "First Order Scharr", "Second" +
+				" Order Scharr", "First Order Prewit", "Second Order Prewit", "First Order Robert" +
+				" Cross", "First Order Frei-Chan", "Second Order Frei-Chan", "First Order" +
+				" Kirsch", "Second Order Kirsch", "Diagonal Laplacian", "Diamond Laplacian 1",
+				"Diamond Laplacian 2"};
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout
+				.simple_spinner_dropdown_item, objs);
+		spinner.setAdapter(adapter);
 
 		return v;
 	}
