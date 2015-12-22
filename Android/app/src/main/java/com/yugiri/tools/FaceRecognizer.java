@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -333,7 +334,7 @@ public class FaceRecognizer {
         return output;
     }
 
-    public static Bitmap clusterFace(Bitmap bitmap){
+    public static Bitmap clusterFace(Bitmap bitmap, List<Point> centroids){
 		Bitmap buffImage = Bitmap.createBitmap(bitmap);
         ArrayList<Point> arrPoint= new ArrayList();
         for(int i = 0 ; i < buffImage.getWidth() ; i++){
@@ -345,7 +346,10 @@ public class FaceRecognizer {
             }
         }
         KMeans kmeans = new KMeans(arrPoint);
-        kmeans.init();
+        if(centroids != null)
+            kmeans.init(centroids);
+        else
+            kmeans.init();
         kmeans.calculate();
 
         for(int i = 0 ; i < kmeans.clusters.get(0).points.size();i++){

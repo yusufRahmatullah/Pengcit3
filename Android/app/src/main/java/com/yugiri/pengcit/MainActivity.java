@@ -71,9 +71,13 @@ public class MainActivity extends AppCompatActivity
 						.commit();
 					break;
 			case 5: fragmentManager.beginTransaction()
-					.replace(R.id.container, SkinDetectorFragment.newInstance())
-					.commit();
-				break;
+						.replace(R.id.container, SkinDetectorFragment.newInstance())
+						.commit();
+					break;
+			case 6: fragmentManager.beginTransaction()
+						.replace(R.id.container, FaceRecognizerFinalFragment.newInstance())
+						.commit();
+					break;
 		}
 
 	}

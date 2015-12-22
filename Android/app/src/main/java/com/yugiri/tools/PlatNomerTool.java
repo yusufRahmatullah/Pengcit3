@@ -445,8 +445,8 @@ public class PlatNomerTool {
     }
 
     public static Bitmap scaleBitmap(Bitmap bitmap){
-        int maxWidth = 256;
-        int maxHeight = 256;
+        int maxWidth = 1024;
+        int maxHeight = 1024;
         int originalWidth = bitmap.getWidth();
         int originalHeight = bitmap.getHeight();
         int newWidth = -1;

@@ -142,7 +142,7 @@ public class FaceRecognizerFragment extends Fragment {
 						}
 						output = PlatNomerTool.getBinaryImage(output);
 						output = Tools.invertImage(output);
-						output = FaceRecognizer.clusterFace(output);
+						output = FaceRecognizer.clusterFace(output, null);
 
 						return output;
 					}

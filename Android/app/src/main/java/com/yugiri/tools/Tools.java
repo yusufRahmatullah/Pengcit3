@@ -193,6 +193,24 @@ public class Tools {
 		return newImage;
 	}
 
+	public static Bitmap drawBoxes(Bitmap image, List<Box> boxes){
+		if(boxes == null)
+			return image;
+		Bitmap newImage = image.copy(image.getConfig(), true);
+		for(Box box : boxes){
+			int color = Color.GREEN;
+			for (int i = box.getMinY(); i <= box.getMaxY(); i++) {
+				for (int j = box.getMinX(); j <= box.getMaxX(); j++) {
+					if (Math.abs(i - box.getMinY()) < 4 || Math.abs(i - box.getMaxY()) < 4 || Math.abs(j - box.getMinX()) < 4
+							|| Math.abs(j - box.getMaxX()) < 4) {
+						newImage.setPixel(j, i, color);
+					}
+				}
+			}
+		}
+		return newImage;
+	}
+
 	/**
 	 * get next x coordinate for check next direction
 	 * @param curDir current direction
@@ -609,6 +627,17 @@ public class Tools {
 		bitmap.setPixels(pix, 0, w, 0, 0, w, h);
 
 		return (bitmap);
+	}
+
+	public static List<Bitmap> getSubImage(Bitmap bitmap, List<Box> boxes){
+		List<Bitmap> bitmaps = new ArrayList<>();
+
+		for(Box box : boxes){
+			Bitmap temp = Bitmap.createBitmap(bitmap, box.minX, box.minY, (box.maxX - box.minX), (box.maxY - box.minY));
+			bitmaps.add(temp);
+		}
+
+		return bitmaps;
 	}
 
 

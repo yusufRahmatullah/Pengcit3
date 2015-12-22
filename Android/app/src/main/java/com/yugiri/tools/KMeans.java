@@ -38,7 +38,19 @@ public class KMeans {
     	kmeans.init();
     	kmeans.calculate();
     }
-    
+
+    public void init(List<Point> centroids){
+        System.out.println("Init centroid");
+        int id = 0;
+        for(Point p : centroids){
+            Cluster cluster = new Cluster(id);
+            cluster.setCentroid(p);
+            clusters.add(cluster);
+            id++;
+        }
+        plotClusters();
+    }
+
     //Initializes the process
     public void init() {
     	//Create Points

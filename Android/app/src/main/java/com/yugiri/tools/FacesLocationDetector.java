@@ -64,7 +64,7 @@ public class FacesLocationDetector {
         ArrayList<Box> boxes = new ArrayList<>();
 
         // load color Table
-        loadColorTable(context);
+        //loadColorTable(context);
 
         /**
          * copy image input ke output
@@ -148,20 +148,34 @@ public class FacesLocationDetector {
      }
 
     private static boolean isOnColorTable(int color, int threshold) {
-        int i = 0;
+        // int i = 0;
+        // boolean found = false;
+        // while (!found && i < colorTable.size()) {
+        //     int dr = Math.abs((color & 0xFF0000) - (colorTable.get(i) & 0xFF0000));
+        //     int dg = Math.abs((color & 0xFF00) - (colorTable.get(i) & 0xFF00));
+        //     int db = Math.abs((color & 0xFF) - (colorTable.get(i) & 0xFF));
+        //     int total = dr+dg+db;
+        //     //int total = (dr+dg+db) / 3;
+        //     //int total = dr*dr + dg*dg + db*db;
+        //     if (total <= threshold) {
+        //     //if(dr <= threshold && dg <= threshold && db <= threshold) {
+        //         found = true;
+        //     }
+        //     i++;
+        // }
+        // return found;
+        // diganti dengan rule-based
         boolean found = false;
-        while (!found && i < colorTable.size()) {
-            int dr = Math.abs((color & 0xFF0000) - (colorTable.get(i) & 0xFF0000));
-            int dg = Math.abs((color & 0xFF00) - (colorTable.get(i) & 0xFF00));
-            int db = Math.abs((color & 0xFF) - (colorTable.get(i) & 0xFF));
-            int total = dr+dg+db;
-            //int total = (dr+dg+db) / 3;
-            //int total = dr*dr + dg*dg + db*db;
-            if (total <= threshold) {
-            //if(dr <= threshold && dg <= threshold && db <= threshold) {
-                found = true;
-            }
-            i++;
+        int red = (color & 0xFF0000) >> 16;
+        int green = (color & 0xFF00) >> 8;
+        int blue = color & 0xFF;
+//        System.out.println("color: "+Integer.toHexString(color));
+//        System.out.println("red: "+Integer.toHexString(red));
+//        System.out.println("green: "+Integer.toHexString(green));
+//        System.out.println("blue: "+Integer.toHexString(blue));
+        if ((float)red/(float)blue >= 1.2 && 
+                red > green && green > blue) {
+            found = true;
         }
         return found;
     }
